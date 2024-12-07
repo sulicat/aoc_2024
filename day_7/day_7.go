@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	col "github.com/sulicat/goboi/colors"
+	"github.com/sulicat/goboi/utils"
 )
 
 var answers []int64
@@ -14,49 +15,92 @@ var nums [][]int64
 
 //nums := [][]int
 
-func check(base int64, nums []int64) (bool, []string) {
-	// exit condition
-	if len(nums) == 1 {
-		return nums[0] == int64(base), []string{"D"}
+func check(target int64, nums []int64, index int, val int64) bool {
+
+	if val > target {
+		return false
 	}
 
-	if base < 0 {
-		return false, []string{"D"}
+	if index >= len(nums) {
+		return val == target
 	}
 
-	l := len(nums)
-	last_item := nums[l-1]
+	check_mult := false
 
-	good_div, path_div := check(int64(base)/int64(last_item), nums[:l-1])
-	good_sub, path_sub := check(int64(base)-int64(last_item), nums[:l-1])
-
-	retpath := path_div
-	if good_sub {
-		retpath = path_sub
-		retpath = append(retpath, "+")
+	if index == 0 {
+		check_mult = check(target, nums, index+1, nums[index])
 	} else {
-		retpath = append(retpath, "*")
+		check_mult = check(target, nums, index+1, val*nums[index])
+
+	}
+	check_add := check(target, nums, index+1, val+nums[index])
+
+	return check_mult || check_add
+}
+
+func concat(v1, v2 int64) int64 {
+	str := strconv.FormatInt(v1, 10) + strconv.FormatInt(v2, 10)
+	return utils.First(strconv.ParseInt(str, 10, 64))
+}
+
+func check2(target int64, nums []int64, index int, val int64) bool {
+
+	if val > target {
+		return false
 	}
 
-	return (good_div || good_sub), retpath
+	if index >= len(nums) {
+		return val == target
+	}
+
+	check_mult := false
+	if index == 0 {
+		check_mult = check2(target, nums, index+1, nums[index])
+	} else {
+		check_mult = check2(target, nums, index+1, val*nums[index])
+	}
+
+	check_add := check2(target, nums, index+1, val+nums[index])
+
+	check_concat := check2(target, nums, index+1, concat(val, nums[index]))
+
+	return check_mult || check_add || check_concat
 }
 
 func p1() {
-	var count uint64
-	count = uint64(0)
+	var count int64
+	count = 0
 
 	for i := range nums {
 
 		fmt.Printf("CHECKING: %d\n", answers[i])
-		good, path := check(int64(answers[i]), nums[i])
-		fmt.Printf("%v %d %v\n %v \n", good, answers[i], nums[i], path)
+		good := check(answers[i], nums[i], 0, 0)
+		fmt.Printf("%v %d %v\n \n", good, answers[i], nums[i])
 
 		if good {
-			count += uint64(answers[i])
+			count += answers[i]
 		}
 	}
 
 	fmt.Printf("COUNT: %d\n", count)
+}
+
+func p2() {
+	var count int64
+	count = 0
+
+	for i := range nums {
+
+		fmt.Printf("CHECKING: %d\n", answers[i])
+		good := check2(answers[i], nums[i], 0, 0)
+		fmt.Printf("%v %d %v\n \n", good, answers[i], nums[i])
+
+		if good {
+			count += answers[i]
+		}
+	}
+
+	fmt.Printf("COUNT2: %d\n", count)
 }
 
 func main() {
@@ -84,5 +128,10 @@ func main() {
 	}
 	fmt.Printf("\n")
 
-	p1()
+	a := 1234
+	b := 5678
+	fmt.Printf("aaa %d\n", concat(int64(a), int64(b)))
+
+	//p1()
+	p2()
 }
