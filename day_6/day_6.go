@@ -186,17 +186,8 @@ func p2() {
 		// fmt.Printf("future guard: %d\n", future_guard_pos)
 		// fmt.Printf("dir: %d\n", dir)
 
-		// every step, get all future guards to the right
-		all_right_futures := join_in_future(guard_pos, (dir+90)%360)
-		if all_right_futures {
-			_, already_used := added_new_obst[future_guard_pos]
-
-			if !already_used {
-				new_obst_count += 1
-			}
-			added_new_obst[future_guard_pos] = 1
-			fmt.Printf("New Obst in: %d\n", future_guard_pos)
-		}
+		// if we placed an obstacle in front of us
+		// do a walk and check for loops
 
 		if check_obstacle(future_guard_pos[0], future_guard_pos[1]) {
 			dir += 90
