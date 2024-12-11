@@ -59,8 +59,8 @@ func p1() {
 		sum += int64(i) * d
 	}
 
-	fmt.Printf("data: %v\n", data)
-	fmt.Printf("SUM: %d\n", sum)
+	//fmt.Printf("data: %v\n", data)
+	//fmt.Printf("SUM: %d\n", sum)
 }
 
 type Segment struct {
@@ -178,7 +178,7 @@ func p2() {
 		// fmt.Printf("\n")
 	}
 
-	fmt.Printf("data: %v\n", data)
+	//fmt.Printf("data: %v\n", data)
 
 	sum := int64(0)
 	for i, d := range data {
@@ -188,7 +188,7 @@ func p2() {
 
 		sum += int64(i) * d
 	}
-	fmt.Printf("SUM: %d\n", sum)
+	fmt.Printf("SUM2: %d\n", sum)
 
 	//fmt.Printf("SUM: %d\n", sum)
 }
@@ -223,6 +223,8 @@ func main() {
 	}
 
 	p2()
+
+	//p1()
 
 	//fmt.Printf("%s\n", data_string)
 }
