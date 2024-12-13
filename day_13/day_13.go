@@ -18,6 +18,11 @@ type Machine struct {
 	Prize Pos
 }
 
+type CacheVal struct {
+	Cost     int
+	Winnable bool
+}
+
 func (a Pos) Add(b Pos) Pos {
 	return Pos{
 		a[0] + b[0],
@@ -25,10 +30,16 @@ func (a Pos) Add(b Pos) Pos {
 }
 
 var machines []Machine
+var cache map[Pos]CacheVal // cache of pos to int
 
 func recurse(start_pos Pos, m Machine) (int, bool) {
 
 	// fmt.Printf("Pos: %v\n", start_pos)
+
+	cached, in_cache := cache[start_pos]
+	if in_cache {
+		return cached.Cost, cached.Winnable
+	}
 
 	if start_pos == m.Prize {
 		// we are at the goal, no button to press
@@ -47,32 +58,43 @@ func recurse(start_pos Pos, m Machine) (int, bool) {
 		a_cost, a_winnable := recurse(a_pos, m)
 		a_cost += 3 // we pressed a
 
+		if !a_winnable {
+
+		}
+
 		b_pos := start_pos.Add(m.B)
 		b_cost, b_winnable := recurse(b_pos, m)
 		b_cost += 1 // we pressed a
 
 		if !a_winnable && !b_winnable {
+
+			cache[start_pos] = CacheVal{-1, false}
 			return -1, false
 		}
 
 		if a_winnable && !b_winnable {
+			cache[start_pos] = CacheVal{a_cost, true}
 			return a_cost, true
 		}
 
 		if !a_winnable && b_winnable {
+			cache[start_pos] = CacheVal{b_cost, true}
 			return b_cost, true
 		}
 
-		return int(math.Min(
-				float64(a_cost),
-				float64(b_cost))),
-			true
+		min := int(math.Min(
+			float64(a_cost),
+			float64(b_cost)))
+
+		cache[start_pos] = CacheVal{min, true}
+		return min, true
 
 	}
 }
 
 func compute(m Machine) (int, bool) {
 	current_pos := Pos{0, 0}
+	cache = map[Pos]CacheVal{}
 	return recurse(current_pos, m)
 }
 
