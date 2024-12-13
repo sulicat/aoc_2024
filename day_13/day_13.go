@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	col "github.com/sulicat/goboi/colors"
+	"gonum.org/v1/gonum/mat"
 )
 
 type Pos [2]int
@@ -93,20 +94,86 @@ func recurse(start_pos Pos, m Machine) (int, bool) {
 }
 
 func compute(m Machine) (int, bool) {
-	current_pos := Pos{0, 0}
-	cache = map[Pos]CacheVal{}
-	return recurse(current_pos, m)
+	// current_pos := Pos{0, 0}
+	// cache = map[Pos]CacheVal{}
+	// return recurse(current_pos, m)
+
+	a := mat.NewDense(2, 2, []float64{
+		float64(m.A[0]), float64(m.B[0]),
+		float64(m.A[1]), float64(m.B[1]),
+	})
+
+	var inv mat.Dense
+	inv.Inverse(a)
+
+	b := mat.NewDense(2, 1, []float64{
+		float64(m.Prize[0]),
+		float64(m.Prize[1]),
+	})
+	b.Mul(&inv, b)
+
+	// fmt.Println(mat.Formatted(a, mat.Prefix("    ")))
+	// fmt.Println(mat.Formatted(&inv, mat.Prefix("    ")))
+	// fmt.Println(mat.Formatted(b, mat.Prefix("    ")))
+
+	ac_f := b.At(0, 0)
+	bc_f := b.At(1, 0)
+
+	diff_a := math.Abs(math.Round(ac_f) - ac_f)
+	diff_b := math.Abs(math.Round(bc_f) - bc_f)
+
+	winnable := diff_a < 0.0001 && diff_b < 0.0001
+
+	cost := 3*math.Round(b.At(0, 0)) + math.Round(b.At(1, 0))
+
+	return int(cost), winnable
+
 }
 
 func p1() {
 
+	out := 0
 	for _, m := range machines {
 		fmt.Printf("Doing math for machine: %v\n", m)
 
 		cost, winnable := compute(m)
 		fmt.Printf("Cost: %v   winnable: %v\n", cost, winnable)
-
+		if winnable {
+			out += cost
+		}
 	}
+
+	fmt.Printf("\nTOTAL COST: %d\n", out)
+
+}
+
+func p2() {
+
+	// a := mat.NewDense(2, 2, []float64{26, 66, 67, 21})
+	// var inv mat.Dense
+	// inv.Inverse(a)
+
+	// b := mat.NewDense(2, 1, []float64{12748, 12176})
+	// b.Mul(&inv, b)
+
+	// fmt.Println(mat.Formatted(a, mat.Prefix("    ")))
+	// fmt.Println(mat.Formatted(&inv, mat.Prefix("    ")))
+	// fmt.Println(mat.Formatted(b, mat.Prefix("    ")))
+
+	// fmt.Printf("---------------------------\n")
+
+	out := 0
+	for _, m := range machines {
+		fmt.Printf("Doing math for machine: %v\n", m)
+
+		cost, winnable := compute(m)
+		fmt.Printf("Cost: %v   winnable: %v\n", cost, winnable)
+		if winnable {
+			out += cost
+		}
+	}
+
+	fmt.Printf("\nTOTAL COST: %d\n", out)
 
 }
 
@@ -145,8 +212,8 @@ func main() {
 			v_x, _ := strconv.Atoi(s_vals[0])
 			v_y, _ := strconv.Atoi(s_vals[1])
 
-			m.Prize[0] = v_x
-			m.Prize[1] = v_y
+			m.Prize[0] = v_x + 10000000000000
+			m.Prize[1] = v_y + 10000000000000
 
 			machines = append(machines, m)
 		}
@@ -154,6 +221,6 @@ func main() {
 
 	fmt.Printf("Machines: %v\n\n", machines)
 
-	p1()
-
+	// p1()
+	p2()
 }
