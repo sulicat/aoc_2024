@@ -11,6 +11,7 @@ import (
 
 var data [][]string
 var groups []Group
+var group_maps []map[Pos]int
 var visited map[Pos]int
 
 type Pos struct {
@@ -100,33 +101,60 @@ func recurse_links(p Pos) []Pos {
 	return out
 }
 
+func count_fences(p Pos, groupmap map[Pos]int) int {
+	out := 4
+	dirs := []Pos{
+		{p.R - 1, p.C},
+		{p.R + 1, p.C},
+		{p.R, p.C - 1},
+		{p.R, p.C + 1},
+	}
+
+	for _, d := range dirs {
+		_, inmap := groupmap[d]
+		if inmap {
+			out -= 1
+		}
+	}
+	return out
+}
+
 func p1() {
 
-	// groups = append(groups, Group{})
-	// current_group := &groups[len(groups)-1]
-	// current_group.Members = make([]Pos, 0)
+	out := 0
 
 	for r := range data {
 		for c := range data[r] {
 
 			_, is_visited := visited[Pos{r, c}]
 			if !is_visited {
-
 				cells := recurse_links(Pos{r, c})
+
 				groups = append(groups, cells)
-				fmt.Printf("%v\n\n", cells)
+				group_map := make(map[Pos]int)
+				for _, cell := range cells {
+					group_map[Pos{cell.R, cell.C}] = 1
+				}
+				group_maps = append(group_maps, group_map)
 			}
 		}
 	}
 
 	for gi, g := range groups {
-		fmt.Printf("Group: %d\n", gi)
+		fmt.Printf("Group: %d len: %d\n", gi, len(g))
+		fmt.Printf("map: %v\n ", group_maps[gi])
 
+		sum_fences := 0
 		for _, p := range g {
-			fmt.Printf("%s ", data[p.R][p.C])
+			// fmt.Printf("%s ", data[p.R][p.C])
+			sum_fences += count_fences(p, group_maps[gi])
 		}
+		out += sum_fences * len(g)
+		fmt.Printf("%d * %d = %d", len(g), sum_fences, sum_fences*len(g))
 		fmt.Printf("\n")
 	}
+
+	fmt.Printf("TOTAL p1: %d\n", out)
 
 }
 
@@ -148,6 +176,8 @@ func main() {
 	fmt.Printf("%v\n", data)
 
 	visited = make(map[Pos]int)
+
+	group_maps = make([]map[Pos]int, 0)
 
 	p1()
 
