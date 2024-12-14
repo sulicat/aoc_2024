@@ -133,17 +133,65 @@ func p1_count() int {
 	return q1_c * q2_c * q3_c * q4_c
 }
 
-func p1() {
+/*func p1() {
 
-	for i := 0; i < 100; i++ {
-		// fmt.Printf("STEP: %d\n", i)
+	for i := 0; i < 2000; i++ {
+		fmt.Printf("STEP: %d\n", i)
 		step()
-		// fmt.Printf("\n")
+		if i > 999 {
+			printmap()
+		}
+		fmt.Printf("\n")
 	}
 
-	// printmap()
+	printmap()
 	out := p1_count()
 	fmt.Printf("p1 count; %d\n", out)
+}*/
+
+func check_tree() bool {
+	// I will assume the tree has a trunc
+	// I will check if I see a line of N dimension bots
+
+	good := false
+
+	trunc_height := 10
+
+	for x := 0; x < width; x++ {
+		for y := 0; y < height-trunc_height; y++ {
+
+			found := true
+			for off := 0; off <= trunc_height; off += 1 {
+				if botCount[Pos{x, y + off}] <= 0 {
+					found = false
+				}
+			}
+			if found {
+				good = true
+				break
+			}
+
+		}
+	}
+
+	return good
+}
+
+func p1() {
+
+	i := 0
+	for {
+		step()
+		good := check_tree()
+		if good {
+			break
+		}
+		i += 1
+	}
+
+	fmt.Printf("STEP: %d\n", i)
+	printmap()
+	fmt.Printf("\n")
 }
 
 func main() {
