@@ -9,11 +9,11 @@ import (
 	col "github.com/sulicat/goboi/colors"
 )
 
-const width = 11
-const height = 7
+// const width = 11
+// const height = 7
 
-// const width = 101
-// const height = 103
+const width = 101
+const height = 103
 
 type Pos [2]int
 
@@ -94,7 +94,7 @@ func p1_count() int {
 		for y := 0; y < mid_y; y++ {
 			bc := botCount[Pos{x, y}]
 			if bc > 0 {
-				fmt.Printf("add: q1 %d %d   %d\n", x, y, bc)
+				// fmt.Printf("add: q1 %d %d   %d\n", x, y, bc)
 				q1_c += bc
 			}
 		}
@@ -104,7 +104,7 @@ func p1_count() int {
 		for y := 0; y < mid_y; y++ {
 			bc := botCount[Pos{x, y}]
 			if bc > 0 {
-				fmt.Printf("add: q2 %d %d   %d\n", x, y, bc)
+				// fmt.Printf("add: q2 %d %d   %d\n", x, y, bc)
 				q2_c += bc
 			}
 		}
@@ -114,7 +114,7 @@ func p1_count() int {
 		for y := mid_y + 1; y < height; y++ {
 			bc := botCount[Pos{x, y}]
 			if bc > 0 {
-				fmt.Printf("add: q3 %d %d   %d\n", x, y, bc)
+				// fmt.Printf("add: q3 %d %d   %d\n", x, y, bc)
 				q3_c += bc
 			}
 		}
@@ -124,7 +124,7 @@ func p1_count() int {
 		for y := mid_y + 1; y < height; y++ {
 			bc := botCount[Pos{x, y}]
 			if bc > 0 {
-				fmt.Printf("add: q4 %d %d   %d\n", x, y, bc)
+				// fmt.Printf("add: q4 %d %d   %d\n", x, y, bc)
 				q4_c += bc
 			}
 		}
@@ -135,13 +135,13 @@ func p1_count() int {
 
 func p1() {
 
-	for i := 0; i < 101; i++ {
+	for i := 0; i < 100; i++ {
 		// fmt.Printf("STEP: %d\n", i)
-		// printmap()
 		step()
 		// fmt.Printf("\n")
 	}
 
+	// printmap()
 	out := p1_count()
 	fmt.Printf("p1 count; %d\n", out)
 }
