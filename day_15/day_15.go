@@ -69,7 +69,56 @@ func make_move(from Pos, to Pos) {
 	}
 }
 
-func move_box(from Pos, move_by Pos, should_move bool) bool {
+func check_vertical(from Pos, move_by Pos) bool {
+	to := from.Add(move_by)
+
+	var other_from Pos
+	var other_to Pos
+
+	if boxes_l[from] > 0 {
+		other_from = from.Add(Pos{1, 0})
+	} else {
+		other_from = from.Add(Pos{-1, 0})
+	}
+
+	other_to = other_from.Add(move_by)
+
+	if obstacles[to] > 0 || obstacles[other_to] > 0 {
+		return false
+	}
+
+	if !check_vertical(to, move_by) || !check_vertical(other_to, move_by) {
+		return false
+	}
+
+	return true
+}
+
+func move_vertical(from Pos, move_by Pos) bool {
+	var other_move_from Pos
+	var other_move_to Pos
+
+	if boxes_l[from] > 0 {
+		other_move_from = from.Add(Pos{1, 0})
+	} else {
+		other_move_from = from.Add(Pos{-1, 0})
+	}
+
+	other_move_to = other_move_from.Add(move_by)
+	to := from.Add(move_by)
+
+	if check_vertical(other_move_from, move_by) && check_vertical(from, move_by) {
+		make_move(other_move_from, other_move_to)
+		make_move(from, to)
+		move_vertical(other_move_to, move_by)
+		move_vertical(to, move_by)
+		return true
+	}
+
+	return false
+}
+
+func move_box(from Pos, move_by Pos) bool {
 	new_pos := from.Add(move_by)
 
 	// fmt.Printf("Checking: %v by %v\n", from, move_by)
@@ -81,7 +130,7 @@ func move_box(from Pos, move_by Pos, should_move bool) bool {
 	// if we are moving left and right, the obstacles just push each other like before
 	if move_by[1] == 0 {
 		if boxes[new_pos] > 0 {
-			can_move := move_box(new_pos, move_by, true)
+			can_move := move_box(new_pos, move_by)
 
 			if can_move {
 
@@ -95,44 +144,9 @@ func move_box(from Pos, move_by Pos, should_move bool) bool {
 		return true
 
 	} else {
-
-		// I need to move the left or right side
-		var other_move_from Pos
-		var other_move_to Pos
-
-		if boxes_l[from] > 0 {
-			other_move_from = from.Add(Pos{1, 0})
-		} else {
-			other_move_from = from.Add(Pos{-1, 0})
-		}
-		other_move_to = other_move_from.Add(move_by)
-
-		if obstacles[other_move_to] > 0 || obstacles[new_pos] > 0 {
-			return false
-		}
-
-		if boxes[other_move_to] <= 0 && boxes[new_pos] <= 0 {
-			if should_move {
-				make_move(from, new_pos)
-				make_move(other_move_from, other_move_to)
-			}
-			return true
-		}
-
-		can_move_l := move_box(new_pos, move_by, false)
-		can_move_r := move_box(other_move_to, move_by, false)
-
-		if can_move_l && can_move_r {
-			move_box(new_pos, move_by, true)
-			move_box(other_move_to, move_by, true)
-
-			make_move(from, new_pos)
-			make_move(other_move_from, other_move_to)
-			return true
-		}
+		return move_vertical(from, move_by)
 	}
 
-	return false
 }
 
 func move_bot(move_by Pos) {
@@ -142,7 +156,7 @@ func move_bot(move_by Pos) {
 		robot = new_pos
 
 	} else if boxes[new_pos] > 0 && obstacles[new_pos] <= 0 {
-		moved := move_box(new_pos, move_by, true)
+		moved := move_box(new_pos, move_by)
 		if moved {
 			robot = new_pos
 		}
