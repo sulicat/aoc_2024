@@ -36,6 +36,7 @@ type Cell struct {
 	is_obstacle bool
 	visited     bool
 	score       int
+	from        Pos
 }
 
 // -------------------------------------------------------------------------------------------------------
@@ -124,12 +125,27 @@ func get_free_neighbors(p Pos) []Pos {
 }
 
 func min_score(sol []PosDir, visited map[Pos]int) {
-	min := math.MaxInt32
-	for _, s := range sol {
-		if visited[s.Pos] <= 0 {
 
+}
+
+func pop_min_score(arr *[]Pos) Pos {
+	min_s := math.MaxInt32
+	min_i := 0
+	for i, p := range *arr {
+		if getScore(p) < min_s {
+			min_s = getScore(p)
+			min_i = i
 		}
 	}
+
+	out := (*arr)[min_i]
+
+	*arr = append((*arr)[:min_i], (*arr)[min_i+1:]...)
+	return out
+}
+
+func calculate_score(src Pos, dst Pos) int {
+	return 1
 }
 
 func p1() {
@@ -139,19 +155,31 @@ func p1() {
 		setVisited(u, false)
 	}
 
-	solution := []PosDir{}
-	solution = append(solution, player)
-	visited := map[Pos]int{}
+	// visited := map[Pos]int{}
+	look_at := []Pos{}
+	look_at = append(look_at, player.Pos)
+	setScore(player.Pos, 0)
 
-	setScore(current, 0)
 	for {
+		if len(look_at) <= 0 {
+			break
+		}
 
-		i := min_score(solution, visited)
+		min_pos := pop_min_score(&look_at)
+		fmt.Printf("%v\n", min_pos)
 
-		break
+		adj := get_free_neighbors(min_pos)
+		for _, adj_p := range adj {
+			if !world[adj_p].visited {
+				setScore(adj_p, getScore(min_pos)+calculate_score(min_pos, adj_p))
+				look_at = append(look_at, adj_p)
+				fmt.Printf("score: %d\n", getScore(adj_p))
+			}
+		}
+
+		setVisited(min_pos, true)
+
 	}
-
-	fmt.Printf(" %v -> %v\n", current, get_free_neighbors(current))
 
 }
 
