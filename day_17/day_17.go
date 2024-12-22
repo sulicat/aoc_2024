@@ -65,7 +65,7 @@ func process(opcode int, operand int) {
 		reg_b = reg_b ^ reg_c
 
 	case 5: //out
-		fmt.Printf("%d,", combo(operand)%8)
+		fmt.Printf("%d %b\n", combo(operand)%8, combo(operand)%8)
 
 	case 6: //bdv
 		num := float64(reg_a)
@@ -123,9 +123,14 @@ func main() {
 		program = append(program, Instruction{instr: int(code)})
 	}
 
-	fmt.Printf("a:%v b:%v c:%v \n", reg_a, reg_b, reg_c)
+	// fmt.Printf("a:%v b:%v c:%v \n", reg_a, reg_b, reg_c)
 
-	fmt.Printf("\nprogram:\n  %v\n\n\n", program)
+	// fmt.Printf("\nprogram:\n  %v\n\n\n", program)
 
+	//p1()
+
+	fmt.Printf("in:\n %v\n\n", program_str)
+	reg_a, _ = strconv.Atoi(os.Args[1])
+	fmt.Printf("REG A: %d %b\n", reg_a, reg_a)
 	p1()
 }
